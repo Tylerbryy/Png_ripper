@@ -1,16 +1,35 @@
 import os
+import subprocess
 from datetime import datetime
+import importlib
+
+def check_and_install_dependencies():
+    """Check and install necessary dependencies if not available."""
+    required_packages = ["colorama", "tkinter", "tqdm", "sd_prompt_reader"]
+    
+    for package in required_packages:
+        try:
+            importlib.import_module(package)
+        except ImportError:
+            print(f"Installing {package}...")
+            subprocess.check_call(["pip", "install", package])
+
+check_and_install_dependencies()
+
 from colorama import Fore, Style
 from sd_prompt_reader.image_data_reader import ImageDataReader
 from tkinter import filedialog
 from tkinter import Tk
-from tqdm import tqdm  
+from tqdm import tqdm
 
 def extract_prompts_from_folder():
     """Extract prompts from images in the specified folder and save to an output file."""
     root = Tk()
     root.withdraw()  # Hide the main window.
     folder_path = filedialog.askdirectory()  # Open the file explorer and get the selected directory path.
+    if not folder_path:
+        print("No folder selected. Exiting...")
+        return
     output_file = "prompts_" + datetime.now().strftime("%Y%m%d") + ".txt"
     with open(output_file, 'w') as f:
         # Get the list of files
@@ -26,6 +45,7 @@ def extract_prompts_from_folder():
                 
                 # Error handling for empty jpeg
                 if not prompt:
+                    os.system('cls' if os.name == 'nt' else 'clear')
                     print(Fore.RED + f"{filename} is a no parameters " + Fore.LIGHTGREEN_EX + "(skipped)" + Style.RESET_ALL)
                 else:
                     f.write(prompt + '\n')
@@ -35,4 +55,7 @@ def extract_prompts_from_folder():
         pbar.close()
 
 if __name__ == "__main__":
+    print(Fore.YELLOW + "Welcome to the PNG Ripper. Please select a folder to extract prompts from." + Style.RESET_ALL)
     extract_prompts_from_folder()
+
+
