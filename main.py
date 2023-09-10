@@ -48,11 +48,12 @@ def extract_prompts_from_folder():
                     os.system('cls' if os.name == 'nt' else 'clear')
                     print(Fore.RED + f"{filename} is a no parameters " + Fore.LIGHTGREEN_EX + "(skipped)" + Style.RESET_ALL)
                 else:
-                    f.write(prompt + '\n\n')  # Added an extra '\n' to insert a line between prompts
+                    f.write(prompt + ' ##' + '\n')  # Added ' ##' to the prompt and an extra '\n' to insert a line between prompts
             # Update the progress bar
             pbar.update(1)
         # Close the progress bar
         pbar.close()
+
 
 if __name__ == "__main__":
     print(Fore.YELLOW + "Welcome to the PNG Ripper. Please select a folder to extract prompts from." + Style.RESET_ALL)
