@@ -22,6 +22,28 @@ from tkinter import filedialog
 from tkinter import Tk
 from tqdm import tqdm
 
+def consolidate_prompts(raw_text):
+    prompts = []
+    current_prompt = []
+    
+    for line in raw_text.split('\n'):
+        stripped_line = line.strip()
+        
+        # Check for the '##' delimiter to identify the end of a prompt.
+        if stripped_line.endswith('##'):
+            current_prompt.append(stripped_line)
+            prompts.append(' '.join(current_prompt))
+            current_prompt = []
+        else:
+            current_prompt.append(stripped_line)
+
+    # For cases where there's no '##' at the end
+    if current_prompt:
+        prompts.append(' '.join(current_prompt))
+    
+    return '\n'.join(prompts)
+
+
 def extract_prompts_from_folder():
     """Extract prompts from images in the specified folder and save to an output file."""
     root = Tk()
@@ -31,6 +53,7 @@ def extract_prompts_from_folder():
         print("No folder selected. Exiting...")
         return
     output_file = "prompts_" + datetime.now().strftime("%Y%m%d") + ".txt"
+    
     with open(output_file, 'w') as f:
         # Get the list of files
         files = os.listdir(folder_path)
@@ -53,6 +76,16 @@ def extract_prompts_from_folder():
             pbar.update(1)
         # Close the progress bar
         pbar.close()
+        
+    # After writing all the prompts to the output file:
+    with open(output_file, 'r') as f:
+        raw_output = f.read()
+    
+    formatted_output = consolidate_prompts(raw_output)
+    
+    with open(output_file, 'w') as f:
+        f.write(formatted_output)
+
 
 
 if __name__ == "__main__":
